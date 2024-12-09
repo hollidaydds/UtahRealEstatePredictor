@@ -1,6 +1,6 @@
 import os
 from flask import Flask, render_template, request, jsonify
-from rentcast_api import get_home_value
+from rentcast_api import get_home_value, get_rentcast_estimate
 
 app = Flask(__name__)
 
@@ -21,15 +21,32 @@ def hello_world():
     return render_template('index.html')
 
 @app.route('/get_rentcast_estimate')
-def get_rentcast_estimate():
+def get_rentcast_estimate_route():
     address = request.args.get('address')
     if not address:
         return jsonify({"error": "Address is required"}), 400
         
     try:
-        estimate_data = get_home_value(address=address)
+        estimate_data = get_home_value(address)
         return jsonify(estimate_data)
     except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/get_estimate')
+def get_estimate():
+    address = request.args.get('address')
+    if not address:
+        return jsonify({"error": "Address is required"}), 400
+        
+    try:
+        print(f"Calling get_rentcast_estimate with address: {address}", flush=True)
+        estimate_data = get_rentcast_estimate(address)
+        print(f"Got estimate data: {estimate_data}", flush=True)
+        return jsonify(estimate_data)
+    except Exception as e:
+        import traceback
+        print(f"Error in get_estimate: {str(e)}", flush=True)
+        print(f"Traceback: {traceback.format_exc()}", flush=True)
         return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':

@@ -320,6 +320,78 @@
             color: #2d3748;
             font-weight: 500;
         }
+        .estimate-details {
+    background: white;
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+.estimate-main {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+.price-range {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1rem;
+}
+.price-item {
+    text-align: center;
+    flex: 1;
+}
+.price-item.main-price {
+    font-size: 1.2em;
+    font-weight: bold;
+}
+.price-label {
+    display: block;
+    color: #666;
+    margin-bottom: 0.5rem;
+}
+.price-value {
+    display: block;
+    font-size: 1.2em;
+    color: #2d3748;
+}
+.comparables-section {
+    margin-top: 2rem;
+    border-top: 1px solid #eee;
+    padding-top: 1rem;
+}
+.comparables-list {
+    display: grid;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+.comparable-item {
+    background: #f8fafc;
+    padding: 1rem;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+}
+.comparable-address {
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+}
+.comparable-details {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 0.5rem;
+    font-size: 0.9em;
+    color: #4a5568;
+}
+.start-over {
+    background-color: #4a5568;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+}
+.start-over:hover {
+    background-color: #2d3748;
+}
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
@@ -484,7 +556,7 @@
                         <div id="foundPropertyDetails"></div>
                     </div>
                     <div class="confirmation-buttons">
-                        <button type="button" class="estimate-button" onclick="getEstimateWithFound()">
+                        <button type="button" class="estimate-button" onclick="getEstimateWithFound(event)">
                             <i class="fas fa-calculator"></i>
                             Get Estimate Now
                         </button>
@@ -492,6 +564,37 @@
                             <i class="fas fa-edit"></i>
                             Modify Details
                         </button>
+                    </div>
+                </div>
+
+                <div class="form-step" id="estimateResults">
+                    <h2>Property Value Estimate</h2>
+                    <div id="estimateDetails" class="estimate-details">
+                        <div class="estimate-main">
+                            <h3>Estimated Value</h3>
+                            <div class="price-range">
+                                <div class="price-item">
+                                    <span class="price-label">Low</span>
+                                    <span class="price-value" id="priceLow">-</span>
+                                </div>
+                                <div class="price-item main-price">
+                                    <span class="price-label">Estimate</span>
+                                    <span class="price-value" id="priceMain">-</span>
+                                </div>
+                                <div class="price-item">
+                                    <span class="price-label">High</span>
+                                    <span class="price-value" id="priceHigh">-</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="comparables-section">
+                            <h3>Comparable Properties</h3>
+                            <div id="comparablesList" class="comparables-list"></div>
+                        </div>
+                    </div>
+                    <div class="button-group">
+                        <button type="button" class="prev" onclick="prevStep('estimateResults')">Back</button>
+                        <button type="button" class="start-over" onclick="startOver()">Start Over</button>
                     </div>
                 </div>
             </form>
@@ -519,9 +622,13 @@
                 document.querySelectorAll('.form-step').forEach(el => {
                     el.classList.remove('active');
                 });
-                document.getElementById('step' + step).classList.add('active');
-                currentStep = step;
-                updateProgress();
+                const stepId = typeof step === 'string' ? step : 'step' + step;
+                const stepElement = document.getElementById(stepId);
+                if (stepElement) {
+                    stepElement.classList.add('active');
+                    currentStep = typeof step === 'number' ? step : (step === 'estimateResults' ? totalSteps : currentStep);
+                    updateProgress();
+                }
             }
 
             function selectSearchType(type) {
@@ -578,8 +685,8 @@
                             .then(data => {
                                 if (data.error) {
                                     alert('Error: ' + data.error);
-                                } else if (data && data.length > 0) {
-                                    const property = data[0];
+                                } else if (data && data.bedrooms !== undefined) {
+                                    const property = data;
                                     
                                     // Store property data
                                     window.rentcastData = data;
@@ -746,7 +853,15 @@
                     });
             }
 
-            function getEstimateWithFound() {
+            function getEstimateWithFound(event) {
+                const address = document.getElementById('address').value;
+                if (!address) {
+                    alert('Address is required');
+                    return;
+                }
+
+                // Show loading state
+                const button = event ? event.currentTarget : document.querySelector('.estimate-button');
                 // Use the pre-filled values to get estimate directly
                 if (validateAllFields()) {
                     submitForm();
@@ -793,6 +908,79 @@
                     }
                 });
             }
+
+            function getEstimateWithFound() {
+    const address = document.getElementById('address').value;
+    if (!address) {
+        alert('Address is required');
+        return;
+    }
+
+    // Show loading state
+    const button = event.currentTarget;
+    const originalText = button.innerHTML;
+    button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Getting Estimate...';
+    button.disabled = true;
+
+    fetch(`/get_estimate?address=${encodeURIComponent(address)}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                alert('Error: ' + data.error);
+            } else {
+                // Format currency
+                const formatCurrency = (value) => {
+                    return new Intl.NumberFormat('en-US', {
+                        style: 'currency',
+                        currency: 'USD',
+                        maximumFractionDigits: 0
+                    }).format(value || 0);
+                };
+
+                // Update price values
+                document.getElementById('priceMain').textContent = formatCurrency(data.price);
+                document.getElementById('priceLow').textContent = formatCurrency(data.priceRangeLow);
+                document.getElementById('priceHigh').textContent = formatCurrency(data.priceRangeHigh);
+
+                // Update comparables
+                const comparablesList = document.getElementById('comparablesList');
+                if (data.comparables && Array.isArray(data.comparables)) {
+                    comparablesList.innerHTML = data.comparables.map(comp => `
+                        <div class="comparable-item">
+                            <div class="comparable-address">${comp.formattedAddress || 'Address not available'}</div>
+                            <div class="comparable-details">
+                                <div>Price: ${formatCurrency(comp.price)}</div>
+                                <div>Beds: ${comp.bedrooms || 'N/A'}</div>
+                                <div>Baths: ${comp.bathrooms || 'N/A'}</div>
+                                <div>Sqft: ${comp.squareFootage ? comp.squareFootage.toLocaleString() : 'N/A'}</div>
+                                <div>Year: ${comp.yearBuilt || 'N/A'}</div>
+                                <div>Distance: ${comp.distance ? comp.distance.toFixed(2) + ' mi' : 'N/A'}</div>
+                            </div>
+                        </div>
+                    `).join('');
+                } else {
+                    comparablesList.innerHTML = '<p>No comparable properties available</p>';
+                }
+
+                // Show results
+                showStep('estimateResults');
+            }
+        })
+        .catch(error => {
+            alert('Error fetching estimate: ' + error);
+        })
+        .finally(() => {
+            // Restore button state
+            button.innerHTML = originalText;
+            button.disabled = false;
+        });
+}
+
+function startOver() {
+    // Reset form and go back to first step
+    document.getElementById('predictForm').reset();
+    showStep(1);
+}
         </script>
     </body>
 </html>
