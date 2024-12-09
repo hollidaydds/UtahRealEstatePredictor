@@ -1,17 +1,17 @@
 from flask import Flask, render_template, request, jsonify
 import os
+import logging
 import json
-import traceback
 from predict_house_price import predict_house_price
-from rentcast_api import get_home_value
+from rentcast_api import get_home_value, get_rentcast_estimate
 
 try:
-    from secrets import GOOGLE_MAPS_API_KEY
+    from api_keys import GOOGLE_MAPS_API_KEY
 except ImportError:
-    GOOGLE_MAPS_API_KEY = os.getenv('GOOGLE_MAPS_API_KEY')
+    GOOGLE_MAPS_API_KEY = os.environ.get('GOOGLE_MAPS_API_KEY')
 
 if not GOOGLE_MAPS_API_KEY:
-    raise ValueError("GOOGLE_MAPS_API_KEY not found in secrets.py or environment variables")
+    raise ValueError("GOOGLE_MAPS_API_KEY not found in api_keys.py or environment variables")
 
 app = Flask(__name__)
 

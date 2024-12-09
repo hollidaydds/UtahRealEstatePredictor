@@ -4,12 +4,12 @@ import traceback
 import os
 
 try:
-    from secrets import RENTCAST_API_KEY
+    from api_keys import RENTCAST_API_KEY
 except ImportError:
-    RENTCAST_API_KEY = os.getenv('RENTCAST_API_KEY')
+    RENTCAST_API_KEY = os.environ.get('RENTCAST_API_KEY')
 
 if not RENTCAST_API_KEY:
-    raise ValueError("RENTCAST_API_KEY not found in secrets.py or environment variables")
+    raise ValueError("RENTCAST_API_KEY not found in api_keys.py or environment variables")
 
 def get_home_value(address, property_type="Single Family", bedrooms=None, bathrooms=None, square_footage=None, comp_count=5):
     """
