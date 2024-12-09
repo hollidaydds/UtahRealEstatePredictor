@@ -1,0 +1,30 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.8.0.0
+MinimumVisualStudioVersion = 17.8.0.0
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PythonSample.AppHost", "PythonSample.AppHost\PythonSample.AppHost.csproj", "{B23FDBF6-3FCB-4C75-B8D5-1123F75F20DA}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PythonSample.ServiceDefaults", "PythonSample.ServiceDefaults\PythonSample.ServiceDefaults.csproj", "{E35CDA12-91C3-43C4-B0EC-94A6439535D3}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B23FDBF6-3FCB-4C75-B8D5-1123F75F20DA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B23FDBF6-3FCB-4C75-B8D5-1123F75F20DA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B23FDBF6-3FCB-4C75-B8D5-1123F75F20DA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B23FDBF6-3FCB-4C75-B8D5-1123F75F20DA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E35CDA12-91C3-43C4-B0EC-94A6439535D3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E35CDA12-91C3-43C4-B0EC-94A6439535D3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E35CDA12-91C3-43C4-B0EC-94A6439535D3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E35CDA12-91C3-43C4-B0EC-94A6439535D3}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {5FF816F7-6E31-4C7C-ADC6-A4C18146F4D5}
+	EndGlobalSection
+EndGlobal
