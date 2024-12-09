@@ -1,9 +1,17 @@
+from flask import Flask, render_template, request, jsonify
 import os
 import json
 import traceback
-from flask import Flask, render_template, request, jsonify
-from rentcast_api import get_rentcast_estimate, get_home_value
 from predict_house_price import predict_house_price
+from rentcast_api import get_home_value
+
+try:
+    from secrets import GOOGLE_MAPS_API_KEY
+except ImportError:
+    GOOGLE_MAPS_API_KEY = os.getenv('GOOGLE_MAPS_API_KEY')
+
+if not GOOGLE_MAPS_API_KEY:
+    raise ValueError("GOOGLE_MAPS_API_KEY not found in secrets.py or environment variables")
 
 app = Flask(__name__)
 
@@ -20,8 +28,9 @@ def hello_world():
                              zipcode=zipcode, 
                              bedrooms=bedrooms,
                              bathrooms=bathrooms,
-                             sqft=sqft)
-    return render_template('index.html')
+                             sqft=sqft,
+                             google_maps_api_key=GOOGLE_MAPS_API_KEY)
+    return render_template('index.html', google_maps_api_key=GOOGLE_MAPS_API_KEY)
 
 @app.route('/get_rentcast_estimate')
 def get_rentcast_estimate_route():
