@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Utah Home Price Predictor</title>
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA4J7mwBroC8aZ16x5x650yIy5yy1kl5hE&libraries=places"></script>
+    <script
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA4J7mwBroC8aZ16x5x650yIy5yy1kl5hE&libraries=places"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -13,6 +15,7 @@
             min-height: 100vh;
             padding: 20px;
         }
+
         .container {
             background: white;
             padding: 2rem;
@@ -22,27 +25,41 @@
             margin: 0 auto;
             text-align: center;
         }
+
         h1 {
             color: #333;
             margin-bottom: 1rem;
         }
+
         p {
             color: #666;
             line-height: 1.6;
         }
+
         .form-step {
             display: none;
             margin: 2rem 0;
         }
+
         .form-step.active {
             display: block;
             animation: fadeIn 0.5s;
         }
+
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
-        input[type="text"], input[type="number"] {
+
+        input[type="text"],
+        input[type="number"] {
             padding: 10px;
             font-size: 16px;
             border: 2px solid #ddd;
@@ -50,15 +67,18 @@
             width: 300px;
             margin-bottom: 1rem;
         }
+
         /* Remove arrows from number input */
         input[type="number"]::-webkit-inner-spin-button,
         input[type="number"]::-webkit-outer-spin-button {
             -webkit-appearance: none;
             margin: 0;
         }
+
         input[type="number"] {
             -moz-appearance: textfield;
         }
+
         select {
             padding: 10px;
             font-size: 16px;
@@ -68,9 +88,11 @@
             margin-bottom: 1rem;
             background-color: white;
         }
+
         .button-group {
             margin-top: 1rem;
         }
+
         button {
             padding: 10px 20px;
             font-size: 16px;
@@ -80,25 +102,31 @@
             transition: background-color 0.3s;
             margin: 0 5px;
         }
+
         button.next {
             background-color: #6e8efb;
             color: white;
         }
+
         button.prev {
             background-color: #ddd;
             color: #666;
         }
+
         button.submit {
             background-color: #4CAF50;
             color: white;
         }
+
         button:hover {
             opacity: 0.9;
         }
+
         button:disabled {
             opacity: 0.5;
             cursor: not-allowed;
         }
+
         .progress-bar {
             width: 100%;
             height: 4px;
@@ -106,29 +134,34 @@
             margin-bottom: 2rem;
             border-radius: 2px;
         }
+
         .progress {
             height: 100%;
             background-color: #6e8efb;
             border-radius: 2px;
             transition: width 0.3s ease;
         }
+
         .welcome-screen {
             text-align: center;
             padding: 2rem;
             max-width: 600px;
             margin: 0 auto;
         }
+
         .welcome-screen h1 {
             font-size: 2.5rem;
             margin-bottom: 1.5rem;
             color: #2d3748;
         }
+
         .welcome-screen p {
             font-size: 1.1rem;
             line-height: 1.6;
             color: #4a5568;
             margin-bottom: 2rem;
         }
+
         .start-button {
             background-color: #6e8efb;
             color: white;
@@ -140,56 +173,76 @@
             transition: transform 0.2s, box-shadow 0.2s;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
+
         .start-button:hover {
             transform: translateY(-2px);
             box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
         }
+
         .icon-container {
             margin-bottom: 2rem;
         }
+
         .icon-container i {
             font-size: 4rem;
             color: #6e8efb;
             margin: 0 1rem;
         }
+
         .features {
             display: flex;
             justify-content: center;
             gap: 2rem;
             margin: 2rem 0;
         }
+
         .feature {
             text-align: center;
             flex: 1;
             max-width: 200px;
         }
+
         .feature i {
             font-size: 2rem;
             color: #6e8efb;
             margin-bottom: 1rem;
         }
+
         .feature h3 {
             color: #2d3748;
             margin-bottom: 0.5rem;
         }
+
         .feature p {
             font-size: 0.9rem;
             color: #718096;
         }
+
         @keyframes float {
-            0% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
-            100% { transform: translateY(0px); }
+            0% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+
+            100% {
+                transform: translateY(0px);
+            }
         }
+
         .floating {
             animation: float 3s ease-in-out infinite;
         }
+
         .search-type-container {
             display: flex;
             gap: 2rem;
             justify-content: center;
             margin: 2rem 0;
         }
+
         .search-type-option {
             background: white;
             padding: 2rem;
@@ -201,28 +254,34 @@
             flex: 1;
             max-width: 250px;
         }
+
         .search-type-option:hover {
             transform: translateY(-5px);
             box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
         }
+
         .search-type-option i {
             font-size: 2.5rem;
             color: #6e8efb;
             margin-bottom: 1rem;
         }
+
         .search-type-option h3 {
             color: #2d3748;
             margin-bottom: 0.5rem;
         }
+
         .search-type-option p {
             color: #718096;
             font-size: 0.9rem;
             margin: 0;
         }
+
         .search-type-option.selected {
             background: #f0f7ff;
             border: 2px solid #6e8efb;
         }
+
         .property-found {
             background: #f0fff4;
             border: 1px solid #68d391;
@@ -231,29 +290,35 @@
             margin: 1rem 0;
             text-align: left;
         }
+
         .property-found h3 {
             color: #2f855a;
             margin-bottom: 0.5rem;
             font-size: 1.1rem;
         }
+
         .property-found p {
             color: #4a5568;
             margin: 0.25rem 0;
             font-size: 0.95rem;
         }
+
         .property-found .update-note {
             font-style: italic;
             color: #718096;
             margin-top: 0.5rem;
             font-size: 0.9rem;
         }
+
         .confirmation-buttons {
             display: flex;
             gap: 1rem;
             margin-top: 2rem;
             justify-content: center;
         }
-        .estimate-button, .modify-button {
+
+        .estimate-button,
+        .modify-button {
             padding: 1rem 2rem;
             border: none;
             border-radius: 8px;
@@ -264,19 +329,24 @@
             gap: 0.5rem;
             transition: transform 0.2s, box-shadow 0.2s;
         }
+
         .estimate-button {
             background: #6e8efb;
             color: white;
         }
+
         .modify-button {
             background: #f7fafc;
             color: #4a5568;
             border: 1px solid #e2e8f0;
         }
-        .estimate-button:hover, .modify-button:hover {
+
+        .estimate-button:hover,
+        .modify-button:hover {
             transform: translateY(-2px);
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
+
         .property-found {
             background: #f0fff4;
             border: 1px solid #68d391;
@@ -285,6 +355,7 @@
             margin: 1rem 0;
             text-align: left;
         }
+
         .property-found h3 {
             color: #2f855a;
             margin-bottom: 1rem;
@@ -293,108 +364,129 @@
             align-items: center;
             gap: 0.5rem;
         }
+
         .property-found p {
             color: #4a5568;
             margin: 0.5rem 0;
             font-size: 1rem;
         }
+
         .property-details {
             margin: 1rem 0;
             padding: 1rem;
             background: white;
             border-radius: 6px;
         }
+
         .property-detail-item {
             display: flex;
             justify-content: space-between;
             padding: 0.5rem;
             border-bottom: 1px solid #e2e8f0;
         }
+
         .property-detail-item:last-child {
             border-bottom: none;
         }
+
         .property-detail-label {
             color: #718096;
         }
+
         .property-detail-value {
             color: #2d3748;
             font-weight: 500;
         }
+
         .estimate-details {
-    background: white;
-    padding: 2rem;
-    border-radius: 10px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-.estimate-main {
-    text-align: center;
-    margin-bottom: 2rem;
-}
-.price-range {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 1rem;
-}
-.price-item {
-    text-align: center;
-    flex: 1;
-}
-.price-item.main-price {
-    font-size: 1.2em;
-    font-weight: bold;
-}
-.price-label {
-    display: block;
-    color: #666;
-    margin-bottom: 0.5rem;
-}
-.price-value {
-    display: block;
-    font-size: 1.2em;
-    color: #2d3748;
-}
-.comparables-section {
-    margin-top: 2rem;
-    border-top: 1px solid #eee;
-    padding-top: 1rem;
-}
-.comparables-list {
-    display: grid;
-    gap: 1rem;
-    margin-top: 1rem;
-}
-.comparable-item {
-    background: #f8fafc;
-    padding: 1rem;
-    border-radius: 8px;
-    border: 1px solid #e2e8f0;
-}
-.comparable-address {
-    font-weight: bold;
-    margin-bottom: 0.5rem;
-}
-.comparable-details {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 0.5rem;
-    font-size: 0.9em;
-    color: #4a5568;
-}
-.start-over {
-    background-color: #4a5568;
-    color: white;
-    border: none;
-    padding: 0.5rem 1rem;
-    border-radius: 4px;
-    cursor: pointer;
-}
-.start-over:hover {
-    background-color: #2d3748;
-}
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .estimate-main {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .price-range {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 1rem;
+        }
+
+        .price-item {
+            text-align: center;
+            flex: 1;
+        }
+
+        .price-item.main-price {
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
+        .price-label {
+            display: block;
+            color: #666;
+            margin-bottom: 0.5rem;
+        }
+
+        .price-value {
+            display: block;
+            font-size: 1.2em;
+            color: #2d3748;
+        }
+
+        .comparables-section {
+            margin-top: 2rem;
+            border-top: 1px solid #eee;
+            padding-top: 1rem;
+        }
+
+        .comparables-list {
+            display: grid;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .comparable-item {
+            background: #f8fafc;
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .comparable-address {
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .comparable-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 0.5rem;
+            font-size: 0.9em;
+            color: #4a5568;
+        }
+
+        .start-over {
+            background-color: #4a5568;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .start-over:hover {
+            background-color: #2d3748;
+        }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
+
 <body>
     <div class="container">
         <div id="welcome-screen" class="welcome-screen">
@@ -404,8 +496,9 @@
                 <i class="fas fa-map-marker-alt floating"></i>
             </div>
             <h1>Welcome to Utah Home Price Predictor</h1>
-            <p>Get accurate home value estimates for any property in Utah using our advanced prediction system. We'll guide you through a simple process to gather the necessary information.</p>
-            
+            <p>Get accurate home value estimates for any property in Utah using our advanced prediction system. We'll
+                guide you through a simple process to gather the necessary information.</p>
+
             <div class="features">
                 <div class="feature">
                     <i class="fas fa-search"></i>
@@ -423,7 +516,7 @@
                     <p>Get estimates in seconds</p>
                 </div>
             </div>
-            
+
             <button class="start-button" onclick="startPredictor()">
                 Get Started <i class="fas fa-arrow-right"></i>
             </button>
@@ -434,7 +527,7 @@
             <div class="progress-bar">
                 <div class="progress" id="progress"></div>
             </div>
-            
+
             <form id="predictForm" action="/" method="post">
                 <div class="form-step active" id="step1">
                     <h2>How would you like to search?</h2>
@@ -447,21 +540,15 @@
                         <div class="search-type-option" onclick="selectSearchType('basic')">
                             <i class="fas fa-search"></i>
                             <h3>Basic Search</h3>
-                            <p>Search by ZIP code and property details</p>
+                            <p>Search by county and property details</p>
                         </div>
                     </div>
                 </div>
 
                 <div class="form-step" id="step2">
                     <h2>Enter Property Address</h2>
-                    <input type="text" 
-                           name="address" 
-                           id="address" 
-                           placeholder="Enter Utah Address"
-                           required>
-                    <input type="hidden" 
-                           name="zipcode" 
-                           id="zipcode">
+                    <input type="text" name="address" id="address" placeholder="Enter Utah Address" required>
+                    <input type="hidden" name="zipcode" id="zipcode">
                     <div class="button-group">
                         <button type="button" class="prev" onclick="prevStep(2)">Previous</button>
                         <button type="button" class="next" onclick="nextStep(2)">Next</button>
@@ -469,14 +556,24 @@
                 </div>
 
                 <div class="form-step" id="step3">
-                    <h2>Enter ZIP Code</h2>
-                    <input type="text" 
-                           name="manual_zipcode" 
-                           id="manual_zipcode" 
-                           pattern="[0-9]{5}" 
-                           maxlength="5"
-                           placeholder="Enter ZIP Code"
-                           required>
+                    <h2>Select County</h2>
+                    <select name="county" id="county" required>
+                        <option value="" disabled selected>Select County</option>
+                        <option value="Salt Lake">Salt Lake County</option>
+                        <option value="Utah">Utah County</option>
+                        <option value="Davis">Davis County</option>
+                        <option value="Weber">Weber County</option>
+                        <option value="Washington">Washington County</option>
+                        <option value="Cache">Cache County</option>
+                        <option value="Box Elder">Box Elder County</option>
+                        <option value="Iron">Iron County</option>
+                        <option value="Tooele">Tooele County</option>
+                        <option value="Summit">Summit County</option>
+                        <option value="Carbon">Carbon County</option>
+                        <option value="Beaver">Beaver County</option>
+                        <option value="Duchesne">Duchesne County</option>
+                        <option value="Juab">Juab County</option>
+                    </select>
                     <div class="button-group">
                         <button type="button" class="prev" onclick="prevStep(3)">Previous</button>
                         <button type="button" class="next" onclick="nextStep(3)">Next</button>
@@ -535,14 +632,13 @@
                 </div>
 
                 <div class="form-step" id="step6">
-                    <h2>Square Footage</h2>
-                    <input type="number" 
-                           name="sqft" 
-                           id="sqft" 
-                           placeholder="Enter Square Footage"
-                           min="100"
-                           max="20000"
-                           required>
+                    <h2>Property Details</h2>
+                    <input type="number" name="sqft" id="sqft" placeholder="Enter Square Footage" min="100" max="20000"
+                        required>
+                    <input type="number" name="lot_size" id="lot_size" placeholder="Enter Lot Size (acres)" min="0.01"
+                        max="100" step="0.01" required>
+                    <input type="number" name="year_built" id="year_built" placeholder="Enter Year Built" min="1800"
+                        max="2024" required>
                     <div class="button-group">
                         <button type="button" class="prev" onclick="prevStep(6)">Previous</button>
                         <button type="button" class="submit" onclick="submitForm()">Get Estimate</button>
@@ -636,7 +732,7 @@
                 const options = document.querySelectorAll('.search-type-option');
                 options.forEach(opt => opt.classList.remove('selected'));
                 event.currentTarget.classList.add('selected');
-                
+
                 // Wait a moment to show the selection before proceeding
                 setTimeout(() => {
                     if (type === 'address') {
@@ -648,23 +744,26 @@
             }
 
             function validateStep(step) {
-                switch(step) {
+                switch (step) {
                     case 1:
                         return searchType !== null;
                     case 2:
                         if (searchType === 'basic') return true; // Skip validation for address step in basic search
                         return document.getElementById('address').value.trim() !== '';
                     case 3:
-                        if (searchType === 'address') return true; // Skip validation for ZIP step in address search
-                        const zipcode = document.getElementById('manual_zipcode').value;
-                        return /^\d{5}$/.test(zipcode);
+                        if (searchType === 'address') return true; // Skip validation for county step in address search
+                        return document.getElementById('county').value !== '';
                     case 4:
                         return document.getElementById('bedrooms').value !== '';
                     case 5:
                         return document.getElementById('bathrooms').value !== '';
                     case 6:
                         const sqft = document.getElementById('sqft').value;
-                        return sqft >= 100 && sqft <= 20000;
+                        const lotSize = document.getElementById('lot_size').value;
+                        const yearBuilt = document.getElementById('year_built').value;
+                        return sqft >= 100 && sqft <= 20000 &&
+                            lotSize >= 0.01 && lotSize <= 100 &&
+                            yearBuilt >= 1800 && yearBuilt <= 2024;
                     default:
                         return true;
                 }
@@ -673,30 +772,29 @@
             function nextStep(currentStep) {
                 if (validateStep(currentStep)) {
                     if (currentStep === 2 && searchType === 'address') {
-                        // Only fetch Rentcast data for address search
-                        const address = document.getElementById('address').value;
+                        // Keep all existing Rentcast API code here unchanged
                         const nextButton = document.querySelector('#step2 button.next');
                         const originalText = nextButton.innerHTML;
                         nextButton.innerHTML = 'Loading...';
+                        const address = document.getElementById('address').value;
                         nextButton.disabled = true;
 
                         fetch(`/get_rentcast_estimate?address=${encodeURIComponent(address)}`)
                             .then(response => response.json())
                             .then(data => {
+                                // Keep all existing Rentcast data handling code
                                 if (data.error) {
                                     alert('Error: ' + data.error);
                                 } else if (data && data.bedrooms !== undefined) {
+                                    // Keep all the property data handling code
                                     const property = data;
-                                    
-                                    // Store property data
                                     window.rentcastData = data;
                                     window.foundProperty = {
                                         bedrooms: property.bedrooms,
                                         bathrooms: property.bathrooms,
                                         squareFootage: property.squareFootage
                                     };
-
-                                    // Pre-fill form fields (hidden until needed)
+                                    // Keep all the form pre-fill code
                                     if (property.bedrooms) {
                                         const bedroomValue = property.bedrooms >= 10 ? "10" : property.bedrooms.toString();
                                         document.getElementById('bedrooms').value = bedroomValue;
@@ -708,46 +806,41 @@
                                     if (property.squareFootage) {
                                         document.getElementById('sqft').value = property.squareFootage;
                                     }
-
-                                    // Show property details in confirmation step
+                                    // Keep all the property details display code
                                     const detailsHtml = `
-                                        <div class="property-details">
-                                            <div class="property-detail-item">
-                                                <span class="property-detail-label">Bedrooms</span>
-                                                <span class="property-detail-value">${property.bedrooms || 'N/A'}</span>
-                                            </div>
-                                            <div class="property-detail-item">
-                                                <span class="property-detail-label">Bathrooms</span>
-                                                <span class="property-detail-value">${property.bathrooms || 'N/A'}</span>
-                                            </div>
-                                            <div class="property-detail-item">
-                                                <span class="property-detail-label">Square Footage</span>
-                                                <span class="property-detail-value">${property.squareFootage || 'N/A'}</span>
-                                            </div>
-                                        </div>
-                                    `;
+                                <div class="property-details">
+                                    <div class="property-detail-item">
+                                        <span class="property-detail-label">Bedrooms</span>
+                                        <span class="property-detail-value">${property.bedrooms || 'N/A'}</span>
+                                    </div>
+                                    <div class="property-detail-item">
+                                        <span class="property-detail-label">Bathrooms</span>
+                                        <span class="property-detail-value">${property.bathrooms || 'N/A'}</span>
+                                    </div>
+                                    <div class="property-detail-item">
+                                        <span class="property-detail-label">Square Footage</span>
+                                        <span class="property-detail-value">${property.squareFootage || 'N/A'}</span>
+                                    </div>
+                                </div>
+                            `;
                                     document.getElementById('foundPropertyDetails').innerHTML = detailsHtml;
-                                    
-                                    // Show confirmation step
                                     showStep('confirmationStep');
                                 } else {
-                                    // Show "no property found" message and go to manual input
+                                    // Keep all the "no property found" code
                                     const notFoundMessage = document.createElement('div');
                                     notFoundMessage.className = 'property-found';
                                     notFoundMessage.style.background = '#fff5f5';
                                     notFoundMessage.style.borderColor = '#fc8181';
                                     notFoundMessage.innerHTML = `
-                                        <h3 style="color: #c53030;"><i class="fas fa-info-circle"></i> No Property Data Found</h3>
-                                        <p>We couldn't find property details for this address. Please enter the details manually.</p>
-                                    `;
-
+                                <h3 style="color: #c53030;"><i class="fas fa-info-circle"></i> No Property Data Found</h3>
+                                <p>We couldn't find property details for this address. Please enter the details manually.</p>
+                            `;
                                     const bedroomsStep = document.getElementById('step4');
                                     const existingMessage = bedroomsStep.querySelector('.property-found');
                                     if (existingMessage) {
                                         existingMessage.remove();
                                     }
                                     bedroomsStep.insertBefore(notFoundMessage, bedroomsStep.firstChild);
-                                    
                                     showStep(4);
                                 }
                             })
@@ -759,12 +852,48 @@
                                 nextButton.innerHTML = originalText;
                                 nextButton.disabled = false;
                             });
+                    } else if (currentStep === 6 && searchType === 'basic') {
+                        // Add new code for basic search final step
+                        const formData = {
+                            bedrooms: parseFloat(document.getElementById('bedrooms').value),
+                            bathrooms: parseFloat(document.getElementById('bathrooms').value),
+                            square_footage: parseFloat(document.getElementById('sqft').value),
+                            lot_size: parseFloat(document.getElementById('lot_size').value),
+                            year_built: parseInt(document.getElementById('year_built').value),
+                            county: document.getElementById('county').value,
+                            property_type: 'Single Family'
+                        };
+
+                        fetch('/predict', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify(formData)
+                        })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.error) {
+                                    alert('Error: ' + data.error);
+                                } else {
+                                    document.getElementById('estimateDetails').innerHTML = `
+                            <div class="estimate-main">
+                                <h3>Estimated Value</h3>
+                                <p class="estimate-price">$${data.predicted_price.toLocaleString()}</p>
+                            </div>
+                        `;
+                                    showStep('estimateResults');
+                                }
+                            })
+                            .catch(error => {
+                                alert('Error getting prediction: ' + error.message);
+                            });
                     } else {
                         // For other steps, just proceed normally
                         showStep(currentStep + 1);
                     }
                 } else {
-                    if (step === 1) {
+                    if (currentStep === 1) {
                         alert('Please select a search type');
                     } else {
                         alert('Please fill in the required information');
@@ -784,29 +913,67 @@
 
             function submitForm() {
                 if (validateStep(6)) {
-                    // Display the stored Rentcast data if available
-                    if (window.rentcastData) {
-                        displayRentcastData(window.rentcastData);
+                    if (searchType === 'address') {
+                        // For address search, use Rentcast data if available
+                        if (window.rentcastData) {
+                            displayRentcastData(window.rentcastData);
+                        } else {
+                            // If no stored data (rare case), fetch it again
+                            const address = document.getElementById('address').value;
+                            fetchRentcastData();
+                        }
                     } else {
-                        // If no stored data (rare case), fetch it again
-                        const address = document.getElementById('address').value;
-                        fetchRentcastData();
+                        // For basic search, use our prediction model
+                        const formData = {
+                            bedrooms: parseFloat(document.getElementById('bedrooms').value),
+                            bathrooms: parseFloat(document.getElementById('bathrooms').value),
+                            square_footage: parseFloat(document.getElementById('sqft').value),
+                            lot_size: parseFloat(document.getElementById('lot_size').value),
+                            year_built: parseInt(document.getElementById('year_built').value),
+                            county: document.getElementById('county').value,
+                            property_type: 'Single Family'
+                        };
+
+                        fetch('/predict', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify(formData)
+                        })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.error) {
+                                    alert('Error: ' + data.error);
+                                } else {
+                                    document.getElementById('estimateDetails').innerHTML = `
+                        <div class="estimate-main">
+                            <h3>Estimated Value</h3>
+                            <p class="estimate-price">$${data.predicted_price.toLocaleString()}</p>
+                        </div>
+                    `;
+                                    showStep('estimateResults');
+                                }
+                            })
+                            .catch(error => {
+                                alert('Error getting prediction: ' + error.message);
+                            });
                     }
                 } else {
-                    alert('Please enter a valid square footage between 100 and 20,000');
+                    alert('Please fill in all required fields with valid values');
                 }
             }
 
             function displayRentcastData(data) {
-                const displayData = {...data};
-                
+                const displayData = { ...data };
+
                 // Display the estimate
                 const estimateDiv = document.createElement('div');
                 estimateDiv.style.marginTop = '1rem';
                 estimateDiv.style.padding = '1rem';
                 estimateDiv.style.backgroundColor = '#e6f3ff';
                 estimateDiv.style.borderRadius = '5px';
-                
+
                 estimateDiv.innerHTML = `
                     <h2 style="color: #2c5282; margin-bottom: 1rem;">Rentcast Response</h2>
                     <pre style="background-color: #f8f9fa; padding: 1rem; border-radius: 5px; overflow-x: auto;">
@@ -877,7 +1044,7 @@
                 const bedrooms = document.getElementById('bedrooms').value;
                 const bathrooms = document.getElementById('bathrooms').value;
                 const sqft = document.getElementById('sqft').value;
-                
+
                 return bedrooms && bathrooms && sqft && sqft >= 100 && sqft <= 20000;
             }
 
@@ -888,17 +1055,17 @@
             function initAutocomplete() {
                 const input = document.getElementById('address');
                 const zipInput = document.getElementById('zipcode');
-                
+
                 const options = {
                     componentRestrictions: { country: 'us' },
                     types: ['address']
                 };
 
                 const autocomplete = new google.maps.places.Autocomplete(input, options);
-                
-                autocomplete.addListener('place_changed', function() {
+
+                autocomplete.addListener('place_changed', function () {
                     const place = autocomplete.getPlace();
-                    
+
                     // Extract ZIP code from address components
                     for (const component of place.address_components) {
                         if (component.types.includes('postal_code')) {
@@ -910,42 +1077,42 @@
             }
 
             function getEstimateWithFound() {
-    const address = document.getElementById('address').value;
-    if (!address) {
-        alert('Address is required');
-        return;
-    }
+                const address = document.getElementById('address').value;
+                if (!address) {
+                    alert('Address is required');
+                    return;
+                }
 
-    // Show loading state
-    const button = event.currentTarget;
-    const originalText = button.innerHTML;
-    button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Getting Estimate...';
-    button.disabled = true;
+                // Show loading state
+                const button = event.currentTarget;
+                const originalText = button.innerHTML;
+                button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Getting Estimate...';
+                button.disabled = true;
 
-    fetch(`/get_estimate?address=${encodeURIComponent(address)}`)
-        .then(response => response.json())
-        .then(data => {
-            if (data.error) {
-                alert('Error: ' + data.error);
-            } else {
-                // Format currency
-                const formatCurrency = (value) => {
-                    return new Intl.NumberFormat('en-US', {
-                        style: 'currency',
-                        currency: 'USD',
-                        maximumFractionDigits: 0
-                    }).format(value || 0);
-                };
+                fetch(`/get_estimate?address=${encodeURIComponent(address)}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.error) {
+                            alert('Error: ' + data.error);
+                        } else {
+                            // Format currency
+                            const formatCurrency = (value) => {
+                                return new Intl.NumberFormat('en-US', {
+                                    style: 'currency',
+                                    currency: 'USD',
+                                    maximumFractionDigits: 0
+                                }).format(value || 0);
+                            };
 
-                // Update price values
-                document.getElementById('priceMain').textContent = formatCurrency(data.price);
-                document.getElementById('priceLow').textContent = formatCurrency(data.priceRangeLow);
-                document.getElementById('priceHigh').textContent = formatCurrency(data.priceRangeHigh);
+                            // Update price values
+                            document.getElementById('priceMain').textContent = formatCurrency(data.price);
+                            document.getElementById('priceLow').textContent = formatCurrency(data.priceRangeLow);
+                            document.getElementById('priceHigh').textContent = formatCurrency(data.priceRangeHigh);
 
-                // Update comparables
-                const comparablesList = document.getElementById('comparablesList');
-                if (data.comparables && Array.isArray(data.comparables)) {
-                    comparablesList.innerHTML = data.comparables.map(comp => `
+                            // Update comparables
+                            const comparablesList = document.getElementById('comparablesList');
+                            if (data.comparables && Array.isArray(data.comparables)) {
+                                comparablesList.innerHTML = data.comparables.map(comp => `
                         <div class="comparable-item">
                             <div class="comparable-address">${comp.formattedAddress || 'Address not available'}</div>
                             <div class="comparable-details">
@@ -958,29 +1125,30 @@
                             </div>
                         </div>
                     `).join('');
-                } else {
-                    comparablesList.innerHTML = '<p>No comparable properties available</p>';
-                }
+                            } else {
+                                comparablesList.innerHTML = '<p>No comparable properties available</p>';
+                            }
 
-                // Show results
-                showStep('estimateResults');
+                            // Show results
+                            showStep('estimateResults');
+                        }
+                    })
+                    .catch(error => {
+                        alert('Error fetching estimate: ' + error);
+                    })
+                    .finally(() => {
+                        // Restore button state
+                        button.innerHTML = originalText;
+                        button.disabled = false;
+                    });
             }
-        })
-        .catch(error => {
-            alert('Error fetching estimate: ' + error);
-        })
-        .finally(() => {
-            // Restore button state
-            button.innerHTML = originalText;
-            button.disabled = false;
-        });
-}
 
-function startOver() {
-    // Reset form and go back to first step
-    document.getElementById('predictForm').reset();
-    showStep(1);
-}
+            function startOver() {
+                // Reset form and go back to first step
+                document.getElementById('predictForm').reset();
+                showStep(1);
+            }
         </script>
-    </body>
+</body>
+
 </html>

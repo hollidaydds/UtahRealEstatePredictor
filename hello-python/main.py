@@ -1,6 +1,9 @@
 import os
+import json
+import traceback
 from flask import Flask, render_template, request, jsonify
-from rentcast_api import get_home_value, get_rentcast_estimate
+from rentcast_api import get_rentcast_estimate, get_home_value
+from predict_house_price import predict_house_price
 
 app = Flask(__name__)
 
@@ -48,6 +51,23 @@ def get_estimate():
         print(f"Error in get_estimate: {str(e)}", flush=True)
         print(f"Traceback: {traceback.format_exc()}", flush=True)
         return jsonify({"error": str(e)}), 500
+@app.route('/predict', methods=['POST'])
+
+def predict():
+    try:
+        data = request.get_json()
+        predicted_price = predict_house_price(
+            bedrooms=data['bedrooms'],
+            bathrooms=data['bathrooms'],
+            square_footage=data['square_footage'],
+            lot_size=data['lot_size'],
+            year_built=data['year_built'],
+            county=data['county'],
+            property_type=data['property_type']
+        )
+        return jsonify({'predicted_price': predicted_price})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 400
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 8111))

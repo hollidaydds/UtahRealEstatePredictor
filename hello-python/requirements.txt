@@ -10,3 +10,11 @@ urllib3==2.2.1
 certifi==2024.6.2
 charset-normalizer==2.0.4
 idna==3.7
+pandas
+numpy
+scikit-learn
+xgboost
+shap
+shapiq
+matplotlib==3.8.2
+seaborn==0.13.0
