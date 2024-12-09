@@ -406,8 +406,27 @@
         }
 
         .estimate-main {
+            margin-bottom: 1rem;
             text-align: center;
-            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background-color: #f0fff4;
+            border: 2px solid #9ae6b4;
+            border-radius: 8px;
+        }
+
+        .estimate-main h3 {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #2f855a;
+            margin-bottom: 0.75rem;
+            text-transform: uppercase;
+        }
+
+        .estimate-main .estimate-price {
+            font-size: 2em;
+            font-weight: bold;
+            color: #38a169;
+            margin: 0;
         }
 
         .price-range {
@@ -482,6 +501,65 @@
 
         .start-over:hover {
             background-color: #2d3748;
+        }
+
+        .estimate-comparison {
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid #eee;
+        }
+
+        .estimate-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-top: 1rem;
+        }
+
+        .estimate-source {
+            text-align: center;
+            padding: 1rem;
+            background: #f8fafc;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .estimate-source h4 {
+            color: #4a5568;
+            margin-bottom: 0.5rem;
+        }
+
+        .property-details {
+            margin-top: 2rem;
+            padding: 1rem;
+            background: #fff;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .our-prediction {
+            margin-bottom: 1rem;
+            text-align: center;
+            padding: 1.5rem;
+            background-color: #f0fff4;
+            border: 2px solid #9ae6b4;
+            border-radius: 8px;
+        }
+
+        .our-prediction .price-label {
+            display: block;
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #2f855a;
+            margin-bottom: 0.75rem;
+            text-transform: uppercase;
+        }
+
+        .our-prediction .price-value {
+            display: block;
+            font-size: 2em;
+            font-weight: bold;
+            color: #38a169;
         }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -668,6 +746,10 @@
                     <div id="estimateDetails" class="estimate-details">
                         <div class="estimate-main">
                             <h3>Estimated Value</h3>
+                            <div class="our-prediction" style="margin-bottom: 1rem; text-align: center;">
+                                <span class="price-label">Our Prediction</span>
+                                <span class="price-value" id="ourPrediction">-</span>
+                            </div>
                             <div class="price-range">
                                 <div class="price-item">
                                     <span class="price-label">Low</span>
@@ -761,9 +843,33 @@
                         const sqft = document.getElementById('sqft').value;
                         const lotSize = document.getElementById('lot_size').value;
                         const yearBuilt = document.getElementById('year_built').value;
-                        return sqft >= 100 && sqft <= 20000 &&
-                            lotSize >= 0.01 && lotSize <= 100 &&
-                            yearBuilt >= 1800 && yearBuilt <= 2024;
+
+                        // Check if all fields are filled
+                        if (!sqft || !lotSize || !yearBuilt) {
+                            alert('Please fill in all fields: Square Footage, Lot Size, and Year Built');
+                            return false;
+                        }
+
+                        // Convert to numbers for range validation
+                        const sqftNum = parseFloat(sqft);
+                        const lotSizeNum = parseFloat(lotSize);
+                        const yearBuiltNum = parseInt(yearBuilt);
+
+                        // Validate ranges
+                        if (sqftNum < 100 || sqftNum > 20000) {
+                            alert('Square footage must be between 100 and 20,000');
+                            return false;
+                        }
+                        if (lotSizeNum < 0.01 || lotSizeNum > 100) {
+                            alert('Lot size must be between 0.01 and 100 acres');
+                            return false;
+                        }
+                        if (yearBuiltNum < 1800 || yearBuiltNum > 2024) {
+                            alert('Year built must be between 1800 and 2024');
+                            return false;
+                        }
+
+                        return true;
                     default:
                         return true;
                 }
@@ -779,22 +885,30 @@
                         const address = document.getElementById('address').value;
                         nextButton.disabled = true;
 
-                        fetch(`/get_rentcast_estimate?address=${encodeURIComponent(address)}`)
+                        fetch('/rentcast', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({ address: address })
+                        })
                             .then(response => response.json())
                             .then(data => {
-                                // Keep all existing Rentcast data handling code
+                                console.log("Received data from server:", data);
                                 if (data.error) {
                                     alert('Error: ' + data.error);
                                 } else if (data && data.bedrooms !== undefined) {
-                                    // Keep all the property data handling code
                                     const property = data;
                                     window.rentcastData = data;
                                     window.foundProperty = {
                                         bedrooms: property.bedrooms,
                                         bathrooms: property.bathrooms,
-                                        squareFootage: property.squareFootage
+                                        squareFootage: property.squareFootage,
+                                        lotSize: property.lotSize,
+                                        yearBuilt: property.yearBuilt,
+                                        county: property.county
                                     };
-                                    // Keep all the form pre-fill code
+
                                     if (property.bedrooms) {
                                         const bedroomValue = property.bedrooms >= 10 ? "10" : property.bedrooms.toString();
                                         document.getElementById('bedrooms').value = bedroomValue;
@@ -806,35 +920,54 @@
                                     if (property.squareFootage) {
                                         document.getElementById('sqft').value = property.squareFootage;
                                     }
-                                    // Keep all the property details display code
+                                    if (property.lotSize) {
+                                        // Convert square feet to acres (1 acre = 43,560 sq ft)
+                                        const lotSizeInAcres = property.lotSize / 43560;
+                                        document.getElementById('lot_size').value = lotSizeInAcres.toFixed(2);
+                                    }
+                                    if (property.yearBuilt) {
+                                        document.getElementById('year_built').value = property.yearBuilt;
+                                    }
+                                    if (property.county) {
+                                        document.getElementById('county').value = property.county;
+                                    }
+
+                                    // Show the estimate results first
+                                    showStep('estimateResults');
+
+                                    // Then update the price displays
+                                    document.getElementById('priceMain').textContent = formatCurrency(data.price);
+                                    document.getElementById('priceLow').textContent = formatCurrency(data.priceRangeLow);
+                                    document.getElementById('priceHigh').textContent = formatCurrency(data.priceRangeHigh);
+                                    document.getElementById('ourPrediction').textContent = formatCurrency(data.predicted_price);
+
                                     const detailsHtml = `
-                                <div class="property-details">
-                                    <div class="property-detail-item">
-                                        <span class="property-detail-label">Bedrooms</span>
-                                        <span class="property-detail-value">${property.bedrooms || 'N/A'}</span>
-                                    </div>
-                                    <div class="property-detail-item">
-                                        <span class="property-detail-label">Bathrooms</span>
-                                        <span class="property-detail-value">${property.bathrooms || 'N/A'}</span>
-                                    </div>
-                                    <div class="property-detail-item">
-                                        <span class="property-detail-label">Square Footage</span>
-                                        <span class="property-detail-value">${property.squareFootage || 'N/A'}</span>
-                                    </div>
-                                </div>
-                            `;
+                <div class="property-details">
+                    <div class="property-detail-item">
+                        <span class="property-detail-label">Bedrooms</span>
+                        <span class="property-detail-value">${property.bedrooms || 'N/A'}</span>
+                    </div>
+                    <div class="property-detail-item">
+                        <span class="property-detail-label">Bathrooms</span>
+                        <span class="property-detail-value">${property.bathrooms || 'N/A'}</span>
+                    </div>
+                    <div class="property-detail-item">
+                        <span class="property-detail-label">Square Footage</span>
+                        <span class="property-detail-value">${property.squareFootage || 'N/A'}</span>
+                    </div>
+                </div>
+            `;
                                     document.getElementById('foundPropertyDetails').innerHTML = detailsHtml;
                                     showStep('confirmationStep');
                                 } else {
-                                    // Keep all the "no property found" code
                                     const notFoundMessage = document.createElement('div');
                                     notFoundMessage.className = 'property-found';
                                     notFoundMessage.style.background = '#fff5f5';
                                     notFoundMessage.style.borderColor = '#fc8181';
                                     notFoundMessage.innerHTML = `
-                                <h3 style="color: #c53030;"><i class="fas fa-info-circle"></i> No Property Data Found</h3>
-                                <p>We couldn't find property details for this address. Please enter the details manually.</p>
-                            `;
+                <h3 style="color: #c53030;"><i class="fas fa-info-circle"></i> No Property Data Found</h3>
+                <p>We couldn't find property details for this address. Please enter the details manually.</p>
+            `;
                                     const bedroomsStep = document.getElementById('step4');
                                     const existingMessage = bedroomsStep.querySelector('.property-found');
                                     if (existingMessage) {
@@ -913,17 +1046,13 @@
 
             function submitForm() {
                 if (validateStep(6)) {
-                    if (searchType === 'address') {
-                        // For address search, use Rentcast data if available
-                        if (window.rentcastData) {
-                            displayRentcastData(window.rentcastData);
-                        } else {
-                            // If no stored data (rare case), fetch it again
-                            const address = document.getElementById('address').value;
-                            fetchRentcastData();
-                        }
+                    if (searchType === 'address' && document.getElementById('address').value) {
+                        // If we have an address, use the Get Estimate button
+                        document.querySelector('.price-range').style.display = 'flex';  // or 'block' depending on your layout
+                        document.querySelector('.comparables-section').style.display = 'block';
+                        getEstimateWithFound();
                     } else {
-                        // For basic search, use our prediction model
+                        // For basic search, use the predict endpoint
                         const formData = {
                             bedrooms: parseFloat(document.getElementById('bedrooms').value),
                             bathrooms: parseFloat(document.getElementById('bathrooms').value),
@@ -946,13 +1075,20 @@
                                 if (data.error) {
                                     alert('Error: ' + data.error);
                                 } else {
-                                    document.getElementById('estimateDetails').innerHTML = `
-                        <div class="estimate-main">
-                            <h3>Estimated Value</h3>
-                            <p class="estimate-price">$${data.predicted_price.toLocaleString()}</p>
-                        </div>
-                    `;
                                     showStep('estimateResults');
+                                    // Clear Rentcast values for basic search
+                                    document.getElementById('priceMain').textContent = '-';
+                                    document.getElementById('priceLow').textContent = '-';
+                                    document.getElementById('priceHigh').textContent = '-';
+                                    document.getElementById('ourPrediction').textContent = formatCurrency(data.predicted_price);
+
+                                    // Clear comparables list
+                                    const comparablesList = document.getElementById('comparablesList');
+                                    comparablesList.innerHTML = '';
+
+                                    // Hide Rentcast-specific sections
+                                    document.querySelector('.price-range').style.display = 'none';
+                                    document.querySelector('.comparables-section').style.display = 'none';
                                 }
                             })
                             .catch(error => {
@@ -965,59 +1101,33 @@
             }
 
             function displayRentcastData(data) {
-                const displayData = { ...data };
-
-                // Display the estimate
-                const estimateDiv = document.createElement('div');
-                estimateDiv.style.marginTop = '1rem';
-                estimateDiv.style.padding = '1rem';
-                estimateDiv.style.backgroundColor = '#e6f3ff';
-                estimateDiv.style.borderRadius = '5px';
-
-                estimateDiv.innerHTML = `
-                    <h2 style="color: #2c5282; margin-bottom: 1rem;">Rentcast Response</h2>
-                    <pre style="background-color: #f8f9fa; padding: 1rem; border-radius: 5px; overflow-x: auto;">
-                        ${JSON.stringify(displayData, null, 2)}
-                    </pre>
-                `;
-
-                // Find the container and add the estimate
-                const resultsDiv = document.getElementById('results');
-                resultsDiv.innerHTML = '';
-                resultsDiv.appendChild(estimateDiv);
-            }
-
-            function fetchRentcastData() {
-                const address = document.getElementById('address').value;
-                if (!address) {
-                    alert('Please enter an address first');
-                    return;
-                }
-
-                // Show loading state
-                const submitButton = document.querySelector('button.submit');
-                const originalText = submitButton.innerHTML;
-                submitButton.innerHTML = 'Loading...';
-                submitButton.disabled = true;
-
-                // Make API request
-                fetch(`/get_rentcast_estimate?address=${encodeURIComponent(address)}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.error) {
-                            alert('Error: ' + data.error);
-                        } else {
-                            displayRentcastData(data);
-                        }
-                    })
-                    .catch(error => {
-                        alert('Error fetching estimate: ' + error.message);
-                    })
-                    .finally(() => {
-                        // Reset button state
-                        submitButton.innerHTML = originalText;
-                        submitButton.disabled = false;
-                    });
+                const estimateDetails = document.getElementById('estimateDetails');
+                estimateDetails.innerHTML = `
+        <div class="estimate-comparison">
+            <h3>Price Estimates Comparison</h3>
+            <div class="estimate-grid">
+                <div class="estimate-source">
+                    <h4>Rentcast Estimate</h4>
+                    <p class="estimate-price">$${data.price.toLocaleString()}</p>
+                </div>
+                <div class="estimate-source">
+                    <h4>Our Model Estimate</h4>
+                    <p class="estimate-price">$${data.predicted_price.toLocaleString()}</p>
+                </div>
+            </div>
+        </div>
+        <div class="property-details">
+            <h3>Property Details</h3>
+            <p><strong>Address:</strong> ${data.address}</p>
+            <p><strong>Bedrooms:</strong> ${data.bedrooms}</p>
+            <p><strong>Bathrooms:</strong> ${data.bathrooms}</p>
+            <p><strong>Square Footage:</strong> ${data.squareFootage.toLocaleString()}</p>
+            <p><strong>Lot Size:</strong> ${(data.lotSize / 43560).toFixed(2)} acres</p>
+            <p><strong>Year Built:</strong> ${data.yearBuilt}</p>
+            <p><strong>County:</strong> ${data.county}</p>
+        </div>
+    `;
+                showStep('estimateResults');
             }
 
             function getEstimateWithFound(event) {
@@ -1143,10 +1253,64 @@
                     });
             }
 
+            function formatCurrency(value) {
+                if (!value) return '$0';
+                return '$' + Number(value).toLocaleString(undefined, {
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                });
+            }
+
             function startOver() {
                 // Reset form and go back to first step
                 document.getElementById('predictForm').reset();
-                showStep(1);
+
+                // Reset all steps to their initial state
+                const steps = document.querySelectorAll('.form-step');
+                steps.forEach(step => {
+                    step.classList.remove('active');
+                });
+
+                // Reset the estimate details
+                const estimateDetails = document.getElementById('estimateDetails');
+                if (estimateDetails) {
+                    estimateDetails.innerHTML = `
+            <div class="estimate-main">
+                <h3>Estimated Value</h3>
+                <div class="our-prediction" style="margin-bottom: 1rem; text-align: center;">
+                    <span class="price-label">Our Prediction</span>
+                    <span class="price-value" id="ourPrediction">-</span>
+                </div>
+                <div class="price-range">
+                    <div class="price-item">
+                        <span class="price-label">Low</span>
+                        <span class="price-value" id="priceLow">-</span>
+                    </div>
+                    <div class="price-item main-price">
+                        <span class="price-label">Estimate</span>
+                        <span class="price-value" id="priceMain">-</span>
+                    </div>
+                    <div class="price-item">
+                        <span class="price-label">High</span>
+                        <span class="price-value" id="priceHigh">-</span>
+                    </div>
+                </div>
+            </div>
+            <div class="comparables-section">
+                <h3>Comparable Properties</h3>
+                <div id="comparablesList" class="comparables-list"></div>
+            </div>
+        `;
+                }
+
+                // Reset any stored data
+                window.rentcastData = null;
+                window.foundProperty = null;
+
+                // Show the first step
+                document.getElementById('step1').classList.add('active');
+                currentStep = 1;
+                updateProgress();
             }
         </script>
 </body>

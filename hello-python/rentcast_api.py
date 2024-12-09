@@ -1,6 +1,7 @@
 import requests
 import json
 import sys
+import traceback
 
 RENTCAST_API_KEY = "699ec3452ff6455899970e158e981e37"
 
@@ -49,40 +50,35 @@ def get_home_value(address, property_type="Single Family", bedrooms=None, bathro
         # Handle case where API returns a list
         if isinstance(data, list) and len(data) > 0:
             print("Response is a list, using first item", flush=True)
-            property_data = data[0]  # Take the first property from the list
-        else:
-            print("Response is not a list, using as is", flush=True)
-            property_data = data
+            data = data[0]
             
-        print(f"Property data being used: {json.dumps(property_data, indent=2)}", flush=True)
-            
-        # Extract property details with proper field names from the API response
-        result = {
-            "formattedAddress": property_data.get("formattedAddress", ""),
-            "bedrooms": property_data.get("bedrooms", 0),
-            "bathrooms": property_data.get("bathrooms", 0),
-            "squareFootage": property_data.get("squareFootage", 0)
+        # Extract and format the relevant data
+        formatted_data = {
+            'price': data.get('price', 0),
+            'priceRangeLow': data.get('price', 0) * 0.9,  # Estimate 10% range
+            'priceRangeHigh': data.get('price', 0) * 1.1,
+            'bedrooms': data.get('bedrooms', 0),
+            'bathrooms': data.get('bathrooms', 0),
+            'squareFootage': data.get('squareFootage', 0),
+            'lotSize': data.get('lotSize', 0),
+            'yearBuilt': data.get('yearBuilt', 0),
+            'county': data.get('county', ''),
+            'address': data.get('address', ''),
+            'city': data.get('city', ''),
+            'state': data.get('state', ''),
+            'zipCode': data.get('zipCode', ''),
+            'comparables': data.get('comparables', [])  # Add comparables
         }
         
-        print(f"Final formatted result: {json.dumps(result, indent=2)}", flush=True)
-        return result
+        print(f"Formatted data: {json.dumps(formatted_data, indent=2)}", flush=True)
+        return formatted_data
         
     except requests.exceptions.RequestException as e:
-        error_msg = str(e)
-        if hasattr(e, 'response') and e.response:
-            try:
-                error_msg = f"{error_msg} - Response: {e.response.text}"
-                print(f"Response headers: {dict(e.response.headers)}", flush=True)
-                print(f"Response status: {e.response.status_code}", flush=True)
-            except:
-                pass
-        print(f"Error making API request: {error_msg}", flush=True)
-        return {"error": f"Failed to get property details: {error_msg}"}
-    except json.JSONDecodeError as e:
-        print(f"Error parsing JSON response: {str(e)}", flush=True)
-        return {"error": "Invalid JSON response from API"}
+        print(f"Error making API request: {str(e)}", flush=True)
+        return {"error": str(e)}
     except Exception as e:
         print(f"Unexpected error: {str(e)}", flush=True)
+        traceback.print_exc()
         return {"error": str(e)}
 
 def get_rentcast_estimate(address=None):

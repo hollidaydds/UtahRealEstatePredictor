@@ -51,6 +51,69 @@ def get_estimate():
         print(f"Error in get_estimate: {str(e)}", flush=True)
         print(f"Traceback: {traceback.format_exc()}", flush=True)
         return jsonify({"error": str(e)}), 500
+
+@app.route('/rentcast', methods=['POST'])
+def get_rentcast():
+    try:
+        print("\n=== Starting /rentcast endpoint ===", flush=True)
+        data = request.get_json()
+        address = data.get('address')
+        print(f"Received data from frontend: {json.dumps(data, indent=2)}", flush=True)
+        
+        if not address:
+            print("No address provided", flush=True)
+            return jsonify({"error": "Address is required"}), 400
+            
+        print("Calling get_home_value...", flush=True)
+        result = get_home_value(address)
+        print(f"Raw Rentcast API result: {json.dumps(result, indent=2)}", flush=True)
+        
+        if "error" in result:
+            print(f"Error from Rentcast API: {result['error']}", flush=True)
+            return jsonify({"error": result["error"]}), 400
+            
+        # Use the updated form data for prediction if available, otherwise use Rentcast data
+        prediction_data = {
+            'bedrooms': float(data.get('bedrooms', result.get('bedrooms', 0))),
+            'bathrooms': float(data.get('bathrooms', result.get('bathrooms', 0))),
+            'square_footage': float(data.get('square_footage', result.get('squareFootage', 0))),
+            'lot_size': float(data.get('lot_size', result.get('lotSize', 0) / 43560)),  # Convert to acres if using Rentcast data
+            'year_built': int(data.get('year_built', result.get('yearBuilt', 0))),
+            'county': data.get('county', result.get('county', '')),
+            'property_type': 'Single Family'
+        }
+        print(f"Prepared prediction data: {json.dumps(prediction_data, indent=2)}", flush=True)
+        
+        # Get our prediction with the updated values
+        print("Calling predict_house_price...", flush=True)
+        predicted_price = predict_house_price(
+            bedrooms=prediction_data['bedrooms'],
+            bathrooms=prediction_data['bathrooms'],
+            square_footage=prediction_data['square_footage'],
+            lot_size=prediction_data['lot_size'],
+            year_built=prediction_data['year_built'],
+            county=prediction_data['county'],
+            property_type=prediction_data['property_type']
+        )
+        print(f"Got prediction: ${predicted_price:,.2f}", flush=True)
+        
+        # Keep all the original Rentcast data and add our prediction
+        response_data = {
+            **result,  # Include all original Rentcast data
+            'predicted_price': predicted_price  # Add our prediction
+        }
+        
+        print(f"Final response being sent to frontend: {json.dumps(response_data, indent=2)}", flush=True)
+        print("=== Finished /rentcast endpoint ===\n", flush=True)
+            
+        return jsonify(response_data)
+        
+    except Exception as e:
+        print(f"Error in get_rentcast: {str(e)}", flush=True)
+        print("Full traceback:", flush=True)
+        traceback.print_exc()
+        return jsonify({"error": str(e)}), 500
+
 @app.route('/predict', methods=['POST'])
 
 def predict():
